@@ -18,9 +18,12 @@ def print_structure(csvs, level=0):
     None
     """
     for key in csvs.keys():
-        print("\t"*level, key)
-        if type(csvs[key]) == dict:
+        print("\n", "\t"*level, key, end=": ")
+        if isinstance(csvs[key], dict):
             print_structure(csvs[key], level+1)
+        else:
+            print(csvs[key].shape, end="")
+
 
 
 
@@ -50,6 +53,39 @@ def clean_gps(df):
     df = df.dropna()
     return df
 
+
+def clean_acc(dirty_df):
+    """
+    Clean the accelerometer data by dropping bad rows and columns
+
+    Parameters
+    ----------
+    left : pd.DataFrame
+        The left accelerometer data
+    right : pd.DataFrame
+        The right accelerometer data
+
+    Returns
+    -------
+    pd.DataFrame
+        The cleaned accelerometer data
+    """
+    useless_cols = ["temp_dash", "temp_above", "temp_below"]
+    for col in useless_cols:
+        if col in dirty_df.columns:
+            dirty_df = dirty_df.drop(columns=[col])
+    
+    for col in dirty_df.columns:
+        if "mag" in col:
+            dirty_df = dirty_df.drop(columns=[col])
+    
+    # remove the word "suspect" from the columns
+    dirty_df.columns = dirty_df.columns.str.replace("_suspension", "")
+    dirty_df.columns = dirty_df.columns.str.replace("dashboard", "dash")
+
+    dirty_df = dirty_df.dropna()
+    
+    return dirty_df
 
 
 def combine_data(dfs):
