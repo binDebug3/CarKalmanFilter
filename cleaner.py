@@ -32,17 +32,37 @@ def print_structure(csvs, level=0):
 
 
 def clean_dict(ddict, verbose=False):
-    for train_type in ddict:
-        if "left" in train_type or "right" in train_type:
-            for folder in ddict[train_type]:
-                ddict[train_type][folder] = clean_acc(ddict[train_type][folder])
-                if verbose:
-                    print("cleaned", train_type, folder)
-        elif "t_gps" in train_type:
-            for folder in ddict[train_type]:
-                ddict[train_type][folder] = clean_gps(ddict[train_type][folder])
-                if verbose:
-                    print("cleaned", train_type, folder)
+    """
+    Clean the data in the dictionary by dropping bad rows and columns
+
+    Parameters
+    ----------
+    ddict : dict
+        The dictionary of dataframes
+    verbose : bool
+        Whether or not to print out verbose information
+    
+    Returns
+    -------
+    dict
+        The cleaned dictionary
+    """
+    # everything here is just navigating the dictionary
+    for t_type in ddict:
+        for csvf in ddict[t_type]:
+            dff = ddict[t_type][csvf]
+            if dff is not None:
+                if "left" in csvf or "right" in csvf:
+                    for folder in dff:
+                        dff[folder] = clean_acc(dff[folder])        # this is the only interesting line
+                        if verbose:
+                            print("cleaned", t_type, csvf, folder)
+                elif "t_gps" in csvf:
+                    for folder in dff:
+                        dff[folder] = clean_gps(dff[folder])        # this is the only other interesting line
+                        if verbose:
+                            print("cleaned", t_type, csvf, folder)
+
     return ddict
 
 
@@ -228,22 +248,22 @@ def load_data(parent=".data", exclude_test=[], exclude_val=[], verbose=False):
                     data = pd.read_csv(os.path.join(path, name))
 
                     # decide which train grouping
-                    train_type = "train"
+                    t_type = "train"
                     if name in exclude_test:
-                        train_type = "test"
+                        t_type = "test"
                     elif name in exclude_val:
-                        train_type = "val"                        
+                        t_type = "val"                        
 
                     # add to data in appropriate location
-                    if data_dict[train_type][file_type] == None:
-                        data_dict[train_type][file_type] = {dir: data}
-                    elif dir in data_dict[train_type][file_type].keys():
+                    if data_dict[t_type][file_type] == None:
+                        data_dict[t_type][file_type] = {dir: data}
+                    elif dir in data_dict[t_type][file_type].keys():
                         continue
                     else:
-                        data_dict[train_type][file_type][dir] = data
+                        data_dict[t_type][file_type][dir] = data
                     
                     # print out verbose information
                     if verbose:
-                        print(f"Loaded {name} from {dir} into {train_type} data")
+                        print(f"Loaded {name} from {dir} into {t_type} data")
 
     return data_dict

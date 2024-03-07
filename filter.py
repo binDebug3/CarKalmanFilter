@@ -24,6 +24,7 @@ def smooth(data, window=100, start_index=0):
     return np.pad(a, (start_index, 0), 'constant', constant_values=(0, 0))
 
 
+
 def add_smoothed_cols(ddict, window=100, verbose=False, inPlace=True):
     """
     Create a new column for each accelerometer column in the data dictionary with the smoothed data.
@@ -53,7 +54,7 @@ def add_smoothed_cols(ddict, window=100, verbose=False, inPlace=True):
                     for col in ddict[t_type][csvf][dir].columns:
                         if "acc_" in col:
                             d = ddict[t_type][csvf][dir][col]
-                            ddict[t_type][csvf][dir][col + "_smooth"] = filter.smooth(d, window=window)[:len(d)]
+                            ddict[t_type][csvf][dir][col + "_smooth"] = smooth(d, window=window)[:len(d)]
                             if verbose:
                                 print("Added", col + "_smooth")
             except TypeError:
