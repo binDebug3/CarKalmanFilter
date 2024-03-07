@@ -22,8 +22,28 @@ def print_structure(csvs, level=0):
         if isinstance(csvs[key], dict):
             print_structure(csvs[key], level+1)
         else:
-            print(csvs[key].shape, end="")
+            if type(csvs[key]) == list:
+                print(len(csvs[key]), end="")
+            elif type(csvs[key]) == pd.DataFrame:
+                print(csvs[key].shape, end="")
+            else:
+                print(type(csvs[key]), end="")
 
+
+
+def clean_dict(ddict, verbose=False):
+    for train_type in ddict:
+        if "left" in train_type or "right" in train_type:
+            for folder in ddict[train_type]:
+                ddict[train_type][folder] = clean_acc(ddict[train_type][folder])
+                if verbose:
+                    print("cleaned", train_type, folder)
+        elif "t_gps" in train_type:
+            for folder in ddict[train_type]:
+                ddict[train_type][folder] = clean_gps(ddict[train_type][folder])
+                if verbose:
+                    print("cleaned", train_type, folder)
+    return ddict
 
 
 
