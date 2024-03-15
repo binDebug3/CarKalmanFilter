@@ -249,9 +249,9 @@ def load_data(parent=".data", exclude_test=[], exclude_val=[], verbose=False):
 
                     # decide which train grouping
                     t_type = "train"
-                    if name in exclude_test:
+                    if dir in exclude_test:
                         t_type = "test"
-                    elif name in exclude_val:
+                    elif dir in exclude_val:
                         t_type = "val"                        
 
                     # add to data in appropriate location
