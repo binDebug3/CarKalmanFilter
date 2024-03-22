@@ -102,7 +102,7 @@ class KalmanFilter(object):
             # update step
             yh = z[:,i] - self.H @ xk
             Sk = self.H @ pk @ self.H.T + self.R
-            Kk = pk @ self.H.T @ inv(Sk)
+            Kk = pk @ self.H.T @ np.linalg.inv(Sk)
             xk = xk + Kk @ yh
             pk = (np.eye(n) - Kk @ self.H) @ pk
 
@@ -132,7 +132,7 @@ class KalmanFilter(object):
         out : ndarray of shape (n,k)
             The next k predicted states
         """
-        out = npempty((x.shape[0],k))
+        out = np.empty((x.shape[0],k))
 
         # iterate to compute the state estimates
         for i in range(k):
@@ -163,7 +163,7 @@ class KalmanFilter(object):
 
         # iterate to compute the state estimates
         for i in range(k):
-            out_i = inv(self.F) @ (x - self.G @ self.u)
+            out_i = np.linalg.inv(self.F) @ (x - self.G @ self.u)
             out[:,i] = out_i
             x = out_i
 
