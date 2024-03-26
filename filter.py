@@ -93,7 +93,7 @@ def add_diff_cols(ddict, verbose=False, inPlace=True):
                             d = ddict[t_type][csvf][dir]
 
                             # this is the only thing going on in this function
-                            print(d.shape)
+                            # print(d.shape)
                             # prepend a zero
                             d["d_" + col] = np.insert((np.diff(d[col])), 0, 0)
                             d["meters_" + col] = np.cumsum(d["d_" + col])

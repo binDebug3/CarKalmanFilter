@@ -236,34 +236,35 @@ def load_data(parent=".data", exclude_test=[], exclude_val=[], verbose=False):
 
     # iterate through all folders
     for dir in folders:
-        path = os.path.join(parent, dir)
-        curr_csv = os.listdir(path)
+        if 'PVS' in dir:
+            path = os.path.join(parent, dir)
+            curr_csv = os.listdir(path)
 
-        # decide which chain and which type of information
-        for name in curr_csv:
-            for file_type in csvs.keys():
-                if file_type in name:
+            # decide which chain and which type of information
+            for name in curr_csv:
+                for file_type in csvs.keys():
+                    if file_type in name:
 
-                    # load data
-                    data = pd.read_csv(os.path.join(path, name))
+                        # load data
+                        data = pd.read_csv(os.path.join(path, name))
 
-                    # decide which train grouping
-                    t_type = "train"
-                    if dir in exclude_test:
-                        t_type = "test"
-                    elif dir in exclude_val:
-                        t_type = "val"                        
+                        # decide which train grouping
+                        t_type = "train"
+                        if dir in exclude_test:
+                            t_type = "test"
+                        elif dir in exclude_val:
+                            t_type = "val"                        
 
-                    # add to data in appropriate location
-                    if data_dict[t_type][file_type] == None:
-                        data_dict[t_type][file_type] = {dir: data}
-                    elif dir in data_dict[t_type][file_type].keys():
-                        continue
-                    else:
-                        data_dict[t_type][file_type][dir] = data
-                    
-                    # print out verbose information
-                    if verbose:
-                        print(f"Loaded {name} from {dir} into {t_type} data")
+                        # add to data in appropriate location
+                        if data_dict[t_type][file_type] == None:
+                            data_dict[t_type][file_type] = {dir: data}
+                        elif dir in data_dict[t_type][file_type].keys():
+                            continue
+                        else:
+                            data_dict[t_type][file_type][dir] = data
+                        
+                        # print out verbose information
+                        if verbose:
+                            print(f"Loaded {name} from {dir} into {t_type} data")
 
     return data_dict

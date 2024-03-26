@@ -102,7 +102,7 @@ class KalmanFilter(object):
             # update step
             yh = z[:,i] - self.H @ xk
             testing = self.H @ pk @ self.H.T
-            print(testing.shape)
+            # print(testing.shape)
 
             Sk = self.H @ pk @ self.H.T + self.R
             Kk = pk @ self.H.T @ np.linalg.inv(Sk)
