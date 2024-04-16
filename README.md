@@ -20,8 +20,7 @@ We seek to answer the following questions: how can we improve the accuracy of ve
 
 The Passive Vehicular Sensors Dataset (PVS) was compiled by researchers at the Universidade Federal de Santa Catarina \cite{9277846}. This dataset is available on Kaggle and contains data from three sets of accelerometers, gyroscopes, magnetometers, thermometers, and GPS trackers. The data comes from three different drivers each driving vehicles on three different routes mapped in Figure \ref{fig:three_courses}, for a total of nine unique scenarios. 
 
-three_courses.png
-
+![Maps of each course](figures/three_courses.png)
 
 The dataset includes a variety of general information such as latitude, longitude, altitude, and speed. It also includes inertial, gyroscopic, and temperature data from five sensors around the suspension and dashboard. The dataset also provides nominal data that describes the road type (paved, unpaved, dirt, cobblestone, asphalt), road quality (good, regular, bad), and whether speed bumps are present. 
 
@@ -46,44 +45,23 @@ Another critical feature we engineer is the distance from the starting location 
 
 
 Our model consists of the following equations:
-\begin{align*}
+$$
 \mathbf{x}_{k+1} = F_{k}\mathbf{x}_k + \mathbf{w}_k \\
-\mathbf{z}_k = H_k\mathbf{x_k} + \mathbf{v}_k
-\end{align*}
+\mathbf{z}_k = H_k\mathbf{x}_k + \mathbf{v}_k
+$$
 
-where our hidden and observed states, respectively, are
-\begin{equation*}
-\begin{split}
-% x hidden state
-\mathbf{x}^T =
-\begin{bmatrix}
-x(t) & y(t) & z(t) & \dot{x}(t) & \dot{y}(t) & \dot{z}(t) & \ddot{x}(t) & \ddot{y}(t) & \ddot{z}(t)
-\end{bmatrix} \\
-% z observed state
-\mathbf{z}^T = \begin{bmatrix}
-x(t) & y(t) & z(t) & \ddot{x}(t) & \ddot{y}(t) & \ddot{z}(t)
-\end{bmatrix}
-\end{split}
-\end{equation*}
+#### Hidden and Observed States
+$$
+\mathbf{x}^T = \begin{bmatrix} x(t) & y(t) & z(t) & \dot{x}(t) & \dot{y}(t) & \dot{z}(t) & \ddot{x}(t) & \ddot{y}(t) & \ddot{z}(t) \end{bmatrix} \\
+\mathbf{z}^T = \begin{bmatrix} x(t) & y(t) & z(t) & \ddot{x}(t) & \ddot{y}(t) & \ddot{z}(t) \end{bmatrix}
+$$
 
-and our transition matrices are 
-\begin{align*}
-F &= 
-\begin{bmatrix}
-I_9  \\
-\end{bmatrix}
-+
-0.1 \times 
-\begin{bmatrix}
-0_{6\times3} & I_6 \\
-0_{3\times3} & 0_{3\times6} \\
-\end{bmatrix} \\
-H &= 
-\begin{bmatrix}
-I_3 & 0_{3\times3} & 0_{3\times3} \\
-0_{3\times3} & 0_{3\times3} & I_3
-\end{bmatrix}
-\end{align*}
+#### Transition Matrices
+$$
+F = \begin{bmatrix} I_9 \\ \end{bmatrix} + 0.1 \times \begin{bmatrix} 0_{6\times3} & I_6 \\ 0_{3\times3} & 0_{3\times6} \end{bmatrix} \\
+H = \begin{bmatrix} I_3 & 0_{3\times3} & 0_{3\times3} \\ 0_{3\times3} & 0_{3\times3} & I_3 \end{bmatrix}
+$$
+
 
 
 We construct the $F$ matrix by observing that acceleration is the derivative of velocity with respect to time, and velocity is the derivative of position. In order to estimate the derivatives for position, we add the current position and the product of time step and velocity, where the time step is $0.1$. We perform a similar operation for velocity and acceleration. 
@@ -93,7 +71,7 @@ We do not include a control variable $u$ since we do not have data for the throt
 Before applying the Kalman filter, we downsample the original location data by $90\%$ to allow the filter to more easily identify the true state as shown in Figure \ref{fig:kalman_downsize}. Downsampling leaves enough information to sufficiently convey the data the GPS records without forcing the Kalman filter to overfit with erratic jumps in estimated position.
 
 
-kalman_downsize.png
+![Downsampling results](figures/kalman_downsize.png)
 
 ### Clustering
 
@@ -116,8 +94,8 @@ To train and test the model, we concatenate the data, then separate "bad" from "
 The Kalman filter's core functionality lies in refining noisy sensor observations to estimate the true state of a system, including both position and acceleration. In Figure \ref{fig:kalman}, we see that the model filters the noise in acceleration data so that the result is less volatile while also accurately predicting position. Figure \ref{fig:kalman_zoomed} shows the same data on a smaller time interval to better visualize how the model performs. 
 
 
-kalman.png
-kalman_zoomed.png
+![Kalman filter results](kalman.png)
+![Close up Kalman filter results](figures/kalman_zoomed.png)
 
 
 ### Predicting Road Quality
@@ -128,10 +106,10 @@ Our clustering models are unable to discern the differences between asphalt, dir
 Since the three-class models are unsuccessful, we attempt to train two-class models to discover if they more accurately predict paved and unpaved roads. The K-means model achieves $50\%$ accuracy, while the spectral model achieves $80\%$ accuracy. However, the full confusion matrix indicates that the spectral model's high performance is primarily due to the disproportionate ratio of paved road over unpaved road labels in the data (see Fig \ref{fig:2_clusters}). We address this issue by sampling an equal number of paved and unpaved data points. However, this approach also produces poor results, suggesting that clustering algorithms may not be well-suited to capture the subtle differences between road types based solely on gyroscope and vertical accelerometer data. 
 
 
-2_clusters.png
+![Results of two-cluster models](figures/2_clusters.png)
 Confusion matrices for a K-means model and a spectral clustering model. Neither model accurately discerned between "paved" and "unpaved" road types.
 
-hmm_result.png
+![Results of HMM](figures/hmm_result.png)
 HMM prediction results. The sections in blue are time steps where the model predicted the road quality correctly, while orange indicates incorrect predictions. The vertical dotted black lines mark the splits between the three different drive data sources.
 
 
@@ -149,6 +127,8 @@ While there are several ethical issues that arise from this project, we consider
 However, if the algorithms are used to allocate road maintenance resources, a model biased towards well-maintained roads might continuously prioritize repairs in wealthier areas. This could create a negative feedback loop where poorer areas with lower quality roads receive even fewer resources, worsening their condition over time. Decision makers must combine algorithmic data analysis with human expertise to ensure informed choices when allocating resources.
 
 We also acknowledge the inherent challenge in assessing the reliability of this data and validating the accuracy of the measurements. While our models reduce some of this variability, we recognize that error may still permeate our results. As a consequence, these findings should be weighed carefully with other factors while making impactful decisions. 
+
+
 ## Conclusion
 
 In this investigation, we seek to accurately clean noise from position and acceleration using a Kalman filter. We also leverage hidden Markov models and clustering techniques to passively predict road quality. 
