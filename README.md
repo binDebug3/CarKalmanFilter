@@ -4,6 +4,8 @@
 
 We investigate the application of passive vehicle sensor data for estimating real-time road surface conditions and the vehicle's state vector. While noise from physical imperfections, the motion of the engine, and sensor reading errors is inevitable, these factors significantly affect the accuracy of the data collected. Implementing a Kalman filter enables more accurate vehicle position, velocity, and acceleration estimation.
 While spectral clustering is unable to reliably determine road conditions, hidden Markov models prove effective in accurately predicting road quality through passive sensor data.
+
+
 ## Problem Statement and Motivation
 
 Autonomous vehicle systems rely on a variety of data inputs to ensure safe navigation. Sensors including GPS trackers, accelerometers, and gyroscopes, among many others, provide crucial information about the surrounding environment to assess and navigate current road conditions. This information helps autonomous systems make informed decisions in real-time, enhancing safety and efficiency on the road. Therefore, integrating sensor data is vital for advancing autonomous and safe transportation systems.
@@ -20,7 +22,12 @@ We seek to answer the following questions: how can we improve the accuracy of ve
 
 The Passive Vehicular Sensors Dataset (PVS) was compiled by researchers at the Universidade Federal de Santa Catarina \cite{9277846}. This dataset is available on Kaggle and contains data from three sets of accelerometers, gyroscopes, magnetometers, thermometers, and GPS trackers. The data comes from three different drivers each driving vehicles on three different routes mapped in Figure \ref{fig:three_courses}, for a total of nine unique scenarios. 
 
+
 ![Maps of each course](figures/three_courses.png)
+
+
+Latitude and longitude data from one driver on the three different courses.
+
 
 The dataset includes a variety of general information such as latitude, longitude, altitude, and speed. It also includes inertial, gyroscopic, and temperature data from five sensors around the suspension and dashboard. The dataset also provides nominal data that describes the road type (paved, unpaved, dirt, cobblestone, asphalt), road quality (good, regular, bad), and whether speed bumps are present. 
 
@@ -44,21 +51,33 @@ Another critical feature we engineer is the distance from the starting location 
 Another critical feature we engineer is the distance from the starting location in meters. We construct this column by converting latitude and longitude coordinates to meters using Vincenty's formula for the geodesic distance between two points. This approximation accounts for the curvature of the Earth's surface and converts the units for position from coordinates to meters and standardizes the units for location with the rest of the features.
 
 
-Our model consists of the following equations:
+#### State Equations
+
+
 $$
 \mathbf{x}_{k+1} = F_{k}\mathbf{x}_k + \mathbf{w}_k \\
 \mathbf{z}_k = H_k\mathbf{x}_k + \mathbf{v}_k
 $$
 
+
 #### Hidden and Observed States
 $$
-\mathbf{x}^T = \begin{bmatrix} x(t) & y(t) & z(t) & \dot{x}(t) & \dot{y}(t) & \dot{z}(t) & \ddot{x}(t) & \ddot{y}(t) & \ddot{z}(t) \end{bmatrix} \\
+\mathbf{x}^T = \begin{bmatrix} x(t) & y(t) & z(t) & \dot{x}(t) & \dot{y}(t) & \dot{z}(t) & \ddot{x}(t) & \ddot{y}(t) & \ddot{z}(t) \end{bmatrix}
+$$
+
+
+$$
 \mathbf{z}^T = \begin{bmatrix} x(t) & y(t) & z(t) & \ddot{x}(t) & \ddot{y}(t) & \ddot{z}(t) \end{bmatrix}
 $$
 
+
 #### Transition Matrices
 $$
-F = \begin{bmatrix} I_9 \\ \end{bmatrix} + 0.1 \times \begin{bmatrix} 0_{6\times3} & I_6 \\ 0_{3\times3} & 0_{3\times6} \end{bmatrix} \\
+F = \begin{bmatrix} I_9 \\ \end{bmatrix} + 0.1 \times \begin{bmatrix} 0_{6\times3} & I_6 \\ 0_{3\times3} & 0_{3\times6} \end{bmatrix}
+$$
+
+
+$$
 H = \begin{bmatrix} I_3 & 0_{3\times3} & 0_{3\times3} \\ 0_{3\times3} & 0_{3\times3} & I_3 \end{bmatrix}
 $$
 
@@ -72,6 +91,10 @@ Before applying the Kalman filter, we downsample the original location data by $
 
 
 ![Downsampling results](figures/kalman_downsize.png)
+
+
+Comparing the x position results from the Kalman Filter trained on the original data and the downsized data.
+
 
 ### Clustering
 
@@ -95,7 +118,15 @@ The Kalman filter's core functionality lies in refining noisy sensor observation
 
 
 ![Kalman filter results](kalman.png)
+
+
+Kalman filter results compared to the original observed data.
+
+
 ![Close up Kalman filter results](figures/kalman_zoomed.png)
+
+
+Kalman filter results zoomed in to highlight model trends.
 
 
 ### Predicting Road Quality
@@ -107,9 +138,14 @@ Since the three-class models are unsuccessful, we attempt to train two-class mod
 
 
 ![Results of two-cluster models](figures/2_clusters.png)
+
+
 Confusion matrices for a K-means model and a spectral clustering model. Neither model accurately discerned between "paved" and "unpaved" road types.
 
+
 ![Results of HMM](figures/hmm_result.png)
+
+
 HMM prediction results. The sections in blue are time steps where the model predicted the road quality correctly, while orange indicates incorrect predictions. The vertical dotted black lines mark the splits between the three different drive data sources.
 
 
