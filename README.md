@@ -26,7 +26,7 @@ The Passive Vehicular Sensors Dataset (PVS) was compiled by researchers at the U
 ![Maps of each course](figures/three_courses.png)
 
 
-Latitude and longitude data from one driver on the three different courses.
+*Latitude and longitude data from one driver on the three different courses.*
 
 
 The dataset includes a variety of general information such as latitude, longitude, altitude, and speed. It also includes inertial, gyroscopic, and temperature data from five sensors around the suspension and dashboard. The dataset also provides nominal data that describes the road type (paved, unpaved, dirt, cobblestone, asphalt), road quality (good, regular, bad), and whether speed bumps are present. 
@@ -55,7 +55,7 @@ Another critical feature we engineer is the distance from the starting location 
 
 
 $$
-\mathbf{x}_{k+1} = F_{k}\mathbf{x}_k + \mathbf{w}_k
+\mathbf{x}_{k+1} = F_k\mathbf{x}_k + \mathbf{w}_k
 $$
 
 
@@ -97,7 +97,7 @@ Before applying the Kalman filter, we downsample the original location data by $
 ![Downsampling results](figures/kalman_downsize.png)
 
 
-Comparing the x position results from the Kalman Filter trained on the original data and the downsized data.
+*Comparing the x position results from the Kalman Filter trained on the original data and the downsized data.*
 
 
 ### Clustering
@@ -124,13 +124,13 @@ The Kalman filter's core functionality lies in refining noisy sensor observation
 ![Kalman filter results](figures/kalman.png)
 
 
-Kalman filter results compared to the original observed data.
+*Kalman filter results compared to the original observed data.*
 
 
 ![Close up Kalman filter results](figures/kalman_zoomed.png)
 
 
-Kalman filter results zoomed in to highlight model trends.
+*Kalman filter results zoomed in to highlight model trends.*
 
 
 ### Predicting Road Quality
@@ -144,13 +144,13 @@ Since the three-class models are unsuccessful, we attempt to train two-class mod
 ![Results of two-cluster models](figures/2_clusters.png)
 
 
-Confusion matrices for a K-means model and a spectral clustering model. Neither model accurately discerned between "paved" and "unpaved" road types.
+*Confusion matrices for a K-means model and a spectral clustering model. Neither model accurately discerned between "paved" and "unpaved" road types.*
 
 
 ![Results of HMM](figures/hmm_result.png)
 
 
-HMM prediction results. The sections in blue are time steps where the model predicted the road quality correctly, while orange indicates incorrect predictions. The vertical dotted black lines mark the splits between the three different drive data sources.
+*HMM prediction results. The sections in blue are time steps where the model predicted the road quality correctly, while orange indicates incorrect predictions. The vertical dotted black lines mark the splits between the three different drive data sources.*
 
 
 Fig. \ref{fig:hmm_result} visualizes the road quality predictions from the second approach for predicting road type. This method relies on an HMM to learn from the raw acceleration data in the vertical direction recorded with the accelerometer on the dashboard. After performing a grid search over all possible combinations of n\_components and rescaling factors, the model performed best with five components and rescaling the prediction confidence by $0.98$. This model classifies "good/regular" roads with $85.7\%$ accuracy and "bad" roads with $100\%$ accuracy. Since $80\%$ of the labels are "good" and $20\%$ are labeled "bad", the model's overall accuracy is $88.6\%$. For testing purposes, the model only makes predictions on thirty second intervals because the road quality does not change very frequently. Consequently, some of the prediction error might arise from intervals that contain both "good/regular" roads and ``bad" roads.
