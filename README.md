@@ -55,7 +55,11 @@ Another critical feature we engineer is the distance from the starting location 
 
 
 $$
-\mathbf{x}_{k+1} = F_{k}\mathbf{x}_k + \mathbf{w}_k \\
+\mathbf{x}_{k+1} = F_{k}\mathbf{x}_k + \mathbf{w}_k
+$$
+
+
+$$
 \mathbf{z}_k = H_k\mathbf{x}_k + \mathbf{v}_k
 $$
 
@@ -117,7 +121,7 @@ To train and test the model, we concatenate the data, then separate "bad" from "
 The Kalman filter's core functionality lies in refining noisy sensor observations to estimate the true state of a system, including both position and acceleration. In Figure \ref{fig:kalman}, we see that the model filters the noise in acceleration data so that the result is less volatile while also accurately predicting position. Figure \ref{fig:kalman_zoomed} shows the same data on a smaller time interval to better visualize how the model performs. 
 
 
-![Kalman filter results](kalman.png)
+![Kalman filter results](figures/kalman.png)
 
 
 Kalman filter results compared to the original observed data.
@@ -174,6 +178,31 @@ Kalman filtering proves highly effective in eliminating noise from acceleration 
 Our exploration of road quality prediction reveals that hidden Markov models significantly outperform clustering techniques. Neither spectral clustering nor K-means clustering accurately identify road quality trends using only accelerometer and gyroscope data. In contrast, after optimizing hyperparameters, our HMM achieves high accuracy in predicting both "good" and "bad" road quality.
 
 Regardless of the model's success, future work might also explore various data preprocessing techniques. Including more customized smoothed data could potentially enhance the performance of the HMM and other models. While clustering methods prove inadequate, future research should explore more promising models for this type of problem such as neural networks in order to achieve further improvements.
-## Repository Link
 
-For full source code and charts, visit the [GitHub repository](https://github.com/binDebug3/CarKalmanFilter).
+
+## References
+
+#### [CarSpeedNet: A Deep Neural Network-based Car Speed Estimation from Smartphone Accelerometer (Or, 2024)](https://arxiv.org/html/2401.07468v1)
+- **Author**: Barack Or
+- **Year**: 2024
+- **URL**: [arXiv](https://arxiv.org/html/2401.07468v1)
+
+#### [Autopilot (Tesla, 2024)](https://www.tesla.com/en_IE/autopilot)
+- **Year**: 2024
+- **URL**: [Tesla](https://www.tesla.com/en_IE/autopilot)
+
+#### [Road surface type classification based on inertial sensors and machine learning (Menegazzo & von Wangenheim, 2021)](https://link.springer.com/article/10.1007/s00607-021-00914-0)
+- **Authors**: Jeferson Menegazzo, Aldo von Wangenheim
+- **Year**: 2021
+- **URL**: [Springer](https://link.springer.com/article/10.1007/s00607-021-00914-0)
+
+#### [Sensor data fusion using Kalman filter (Sasiadek & Hartana, 2000)](https://doi.org/10.1109/IFIC.2000.859866)
+- **Authors**: J.Z. Sasiadek, P. Hartana
+- **Year**: 2000
+- **DOI**: [10.1109/IFIC.2000.859866](https://doi.org/10.1109/IFIC.2000.859866)
+
+#### [Multi-Contextual and Multi-Aspect Analysis for Road Surface Type Classification Through Inertial Sensors and Deep Learning (Menegazzo & von Wangenheim, 2020)](https://doi.org/10.1109/SBESC51047.2020.9277846)
+- **Authors**: J. Menegazzo, A. von Wangenheim
+- **Year**: 2020
+- **DOI**: [10.1109/SBESC51047.2020.9277846](https://doi.org/10.1109/SBESC51047.2020.9277846)
+
